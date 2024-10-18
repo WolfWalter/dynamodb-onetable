@@ -35,7 +35,7 @@ const schema = {
               schema: {
                   street: {type: String},
                   city: {type: String},
-                  zip: {type: String},
+                  zip: {type: String, required: false},
               },
             },
             updatedAt: {type: Date },
@@ -60,13 +60,13 @@ test('Create Table', async () => {
     }
 })
 
-test('Update sub property to undefined/null should not trow', async () => {
+test('Update sub property to null should not throw?', async () => {
   let User = table.getModel('User')
 
-  // throws OneTableError: OneTable execute failed "update" for "User", The conditional request failed
+  // throws "OneTable execute failed \"update\" for \"User\", Invalid UpdateExpression: Two document paths overlap with each other; must remove or rewrite one of these paths; path one: [address, zip], path two: [address]"
   // because it tries to remove the `zip` and set the `address` in the same update
   await expect(
-    () => User.update({email: 'roadrunner@acme.com', address: { street: 'aStreet', city: 'aCity', zip: undefined }})
+    () => User.update({email: 'roadrunner@acme.com', address: { street: 'aStreet', city: 'aCity', zip: null as unknown as undefined }})
   ).rejects.not.toThrow()
 })
 
