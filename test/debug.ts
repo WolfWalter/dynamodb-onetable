@@ -63,20 +63,24 @@ test('Create Table', async () => {
 test('Update sub property to null should not throw?', async () => {
   let User = table.getModel('User')
 
+  await User.create({email: 'roadrunner@acme.com'})
+
   // throws "OneTable execute failed \"update\" for \"User\", Invalid UpdateExpression: Two document paths overlap with each other; must remove or rewrite one of these paths; path one: [address, zip], path two: [address]"
   // because it tries to remove the `zip` and set the `address` in the same update
-  await expect(
-    () => User.update({email: 'roadrunner@acme.com', address: { street: 'aStreet', city: 'aCity', zip: null as unknown as undefined }})
-  ).rejects.not.toThrow()
+  await expect(      
+    User.update({email: 'roadrunner@acme.com', address: { street: 'aStreet', city: 'aCity', zip: null as unknown as undefined }})
+  ).resolves.not.toThrow();
 })
 
 test('Update date field with set should not throw', async () => {
   let User = table.getModel('User')
 
+  await User.create({email: 'roadrunner@acme.com'})
+
   // throws: Unsupported type passed: Mon Oct 07 2024 16:21:29 GMT+0200 (Central European Summer Time). Pass options.convertClassInstanceToMap=true to marshall typeof object as map attribute. 
   await expect(
-    () => User.update({email: 'roadrunner@acme.com'},{ set: { updatedAt: new Date() }})
-  ).rejects.not.toThrow()
+     User.update({email: 'roadrunner@acme.com'},{ set: { updatedAt: new Date()  }})
+  ).resolves.not.toThrow()
 
 
   // if setting options.convertClassInstanceToMap=true as suggested by the error it gets worse and the date gets set to `Invalid Date`for the local DDB and an empty object/DDB-Map in a real DDB
